@@ -113,7 +113,7 @@ int main(int argc, char **argv)
     // Wait for generator to return (all tasks generated)
     pthread_join(generator_thread, NULL);
 
-    // Cancle consumer 1
+    // Cancel consumer 1
     pthread_cancel(consumer1);
     pthread_join(consumer1, NULL);
 
