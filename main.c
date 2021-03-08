@@ -4,6 +4,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "task.h"
+
 // Mutex for shared taskqueue
 static pthread_mutex_t mtx_task = PTHREAD_MUTEX_INITIALIZER;
 
@@ -15,67 +17,6 @@ static pthread_cond_t cond_finished = PTHREAD_COND_INITIALIZER;
 
 // Flag indicating to consumer threads to stop execution
 static volatile int quit = 0;
-
-// Counter used for setting task id
-static volatile int taskcounter = 0;
-
-// Struct for simulating a task
-struct task_T
-{
-    int id;              // Task id
-    int processtime;     // Simulated time the process should take
-    struct task_T *next; // Next task in queue - used internal for queue
-};
-
-// FIFO list of tasks to do for threads
-struct tasklist_T
-{
-    struct task_T *firstentry;
-} taskqueue;
-
-// True if there are tasks in the queue
-int task_hasnext()
-{
-    return taskqueue.firstentry != NULL;
-}
-
-// Get next task in queue
-struct task_T *task_next()
-{
-    struct task_T *task;
-    task = taskqueue.firstentry;
-    taskqueue.firstentry = task->next;
-    return task;
-}
-
-// Get last task in queue - used for push
-struct task_T *task_last()
-{
-    struct task_T *task;
-    task = taskqueue.firstentry;
-    while (task->next != NULL)
-        task = task->next;
-    return task;
-}
-
-// Push new task to queue
-void task_push(struct task_T *task)
-{
-    struct task_T *lasttask;
-    if (taskqueue.firstentry == NULL)
-        taskqueue.firstentry = task;
-    else
-    {
-        lasttask = task_last();
-        lasttask->next = task;
-    }
-}
-
-// Frees allocated memory
-void task_destroy(struct task_T *task)
-{
-    free(task);
-}
 
 // Thread who created tasks
 static void *thread_taskgenerator(void *arg)
@@ -95,9 +36,7 @@ static void *thread_taskgenerator(void *arg)
         taskload = 1 + rand_r(&gen_seed) % 4;
 
         // Create new task
-        task = (struct task_T *)malloc(sizeof(struct task_T));
-        task->processtime = taskload;
-        task->id = taskcounter++; // Safe, only incremented here
+        task = task_create(taskload);
 
         pthread_mutex_lock(&mtx_task);
         task_push(task);
