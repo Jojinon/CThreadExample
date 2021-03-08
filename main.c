@@ -52,9 +52,9 @@ static void *thread_taskgenerator(void *arg)
     pthread_cond_broadcast(&cond_newtask);
 }
 
-static void cleanup_consumer_cancle(void *arg)
+static void cleanup_consumer_cancel(void *arg)
 {
-    printf("Consumer cancled, freeing allocated memory\n");
+    printf("Consumer canceled, freeing allocated memory\n");
     task_destroy(arg);
 }
 
@@ -77,8 +77,8 @@ static void *thread_taskconsumer(void *arg)
         }
         task = task_next();
 
-        // If thread is cancled during processing make sure allocated memory is freed
-        pthread_cleanup_push(cleanup_consumer_cancle, task);
+        // If thread is canceled during processing make sure allocated memory is freed
+        pthread_cleanup_push(cleanup_consumer_cancel, task);
 
         printf("TaskCon: Task%d of length %d acquired\n", task->id, task->processtime);
 
