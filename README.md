@@ -1,8 +1,11 @@
 # Threaded Exempel
 
-Bygg programmet genom att köra `make` i terminalen.
+Bygg programmet genom att köra `make`
 ```
 make
 ```
 
-Kör programmet genom att köra ./main i terminalen.
+Kör programmet 
+```
+./main
+```
